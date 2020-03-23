@@ -19,6 +19,7 @@ import org.mmtk.utility.HeaderByte;
 import org.mmtk.utility.deque.*;
 import org.mmtk.utility.alloc.Allocator;
 import org.mmtk.utility.statistics.Stats;
+import org.mmtk.vm.Config;
 import org.mmtk.vm.VM;
 import static org.mmtk.plan.generational.Gen.USE_OBJECT_BARRIER_FOR_AASTORE;
 import static org.mmtk.plan.generational.Gen.USE_OBJECT_BARRIER_FOR_PUTFIELD;
@@ -134,9 +135,14 @@ import org.vmmagic.unboxed.*;
         modbuf.insert(src);
       }
     } else {
-      if (!Gen.inNursery(slot) && Gen.inNursery(tgt)) {
-        if (Gen.GATHER_WRITE_BARRIER_STATS) Gen.wbSlow.inc();
-        remset.insert(slot);
+      if (VM.config.NO_WRITE_BARRIER)
+        return;
+      if (VM.config.BOUNDARY_BARRIER) {
+        if (!Gen.inNursery(slot) && Gen.inNursery(tgt)) {
+          if (Gen.GATHER_WRITE_BARRIER_STATS) Gen.wbSlow.inc();
+          remset.insert(slot);
+        }
+        return;
       }
     }
   }
@@ -168,9 +174,17 @@ import org.vmmagic.unboxed.*;
    */
   @Inline
   private void fastPath(Address slot, ObjectReference tgt) {
-    if (Gen.GATHER_WRITE_BARRIER_STATS) Gen.wbFast.inc();
+    if (Gen.GATHER_WRITE_BARRIER_STATS) {
+      Gen.wbFast.inc();
+      Gen.rootWbFast.inc();
+    }
     if (Gen.inNursery(tgt)) {
-      if (Gen.GATHER_WRITE_BARRIER_STATS) Gen.wbSlow.inc();
+      if (Gen.GATHER_WRITE_BARRIER_STATS) {
+        Gen.wbSlow.inc();
+        Gen.rootWbSlow.inc();
+      }
+      if (VM.config.NO_WRITE_BARRIER)
+        return;
       remset.insert(slot);
     }
   }

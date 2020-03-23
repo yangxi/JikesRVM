@@ -60,7 +60,7 @@ public abstract class Gen extends StopTheWorld {
   protected static final float SURVIVAL_ESTIMATE = 0.8f; // est yield
   protected static final float MATURE_FRACTION = 0.5f; // est yield
   private static final float WORST_CASE_COPY_EXPANSION = 1.5f; // worst case for addition of one word overhead due to address based hashing
-  public static final boolean IGNORE_REMSETS = false;
+  public static final boolean IGNORE_REMSETS = true;
   public static final boolean USE_NON_HEAP_OBJECT_REFERENCE_WRITE_BARRIER = false;
   public static final boolean USE_OBJECT_BARRIER_FOR_AASTORE = false; // choose between slot and object barriers
   public static final boolean USE_OBJECT_BARRIER_FOR_PUTFIELD = false; // choose between slot and object barriers
@@ -95,6 +95,8 @@ public abstract class Gen extends StopTheWorld {
   private static final Timer fullHeapTime = new Timer("majorGCTime", false, true);
   protected static final EventCounter wbFast;
   protected static final EventCounter wbSlow;
+  protected static final EventCounter rootWbFast;
+  protected static final EventCounter rootWbSlow;
   public static final SizeCounter nurseryMark;
   public static final SizeCounter nurseryCons;
 
@@ -139,9 +141,13 @@ public abstract class Gen extends StopTheWorld {
     if (GATHER_WRITE_BARRIER_STATS) {
       wbFast = new EventCounter("wbFast");
       wbSlow = new EventCounter("wbSlow");
+      rootWbFast = new EventCounter("rootWbFast");
+      rootWbSlow = new EventCounter("rootWbSlow");
     } else {
       wbFast = null;
       wbSlow = null;
+      rootWbFast = null;
+      rootWbSlow = null;
     }
     if (Stats.GATHER_MARK_CONS_STATS) {
       nurseryMark = new SizeCounter("nurseryMark", true, true);

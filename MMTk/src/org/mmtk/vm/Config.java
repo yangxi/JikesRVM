@@ -26,13 +26,31 @@ public class Config {
   /** Zero pages on release? */
   public final boolean ZERO_PAGES_ON_RELEASE;
 
+  public final boolean NO_WRITE_BARRIER;
+
+  public final boolean CARD_MARKING_BARRIER;
+
+  public final boolean BOUNDARY_BARRIER;
+
+  public final boolean REGION_BARRIER;
+
+  public final boolean STAB_BARRIER;
+
+  public final boolean DRC_BARRIER;
+
   Config(BuildTimeConfig config) {
     ACTIVE_PLAN            = config.getPlanName();
     HEADER_MARK_BITS       = config.getBooleanProperty("mmtk.headerMarkBit",true);
     ZERO_PAGES_ON_RELEASE  = config.getBooleanProperty("mmtk.zeroPagesOnRelease",false);
+    NO_WRITE_BARRIER = config.getBooleanProperty("mmtk.noWriteBarrier", false);
+    CARD_MARKING_BARRIER = config.getBooleanProperty("mmtk.cardMarkingBarrier", false);
+    BOUNDARY_BARRIER = config.getBooleanProperty("mmtk.boundaryBarrier", false);
+    REGION_BARRIER = config.getBooleanProperty("mmtk.regionBarrier", false);
+    STAB_BARRIER = config.getBooleanProperty("mmtk.stabBarrier", false);
+    DRC_BARRIER = config.getBooleanProperty("mmtk.drcBarrier", false);
   }
 
-  public void printConfig() {
+  public void printConfig(){
     Log.writeln("================ MMTk Configuration ================");
     Log.writeln("plan = ");
     Log.writeln(ACTIVE_PLAN);
